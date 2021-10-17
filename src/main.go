@@ -6,32 +6,32 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/signup", signupHandler)
-	http.HandleFunc("/signin", signinHandler)
-	http.HandleFunc("/home", homeHandler)
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.HandleFunc("/", ServeFiles)
 
 	log.Fatal((http.ListenAndServe(":1010", nil)))
 }
 
-func signupHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		http.ServeFile(res, req, "html/signup.html")
-		return
-	}
-}
+func ServeFiles(res http.ResponseWriter, req *http.Request) {
 
-func signinHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		http.ServeFile(res, req, "html/signin.html")
-		return
-	}
-}
+	path := req.URL.Path
 
-func homeHandler(res http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		http.ServeFile(res, req, "html/home.html")
-		return
+	if path == "/signup" {
+		if req.Method == "GET" {
+			http.ServeFile(res, req, "./static/signup.html")
+			return
+		}
+	} else if path == "/signin" {
+		if req.Method == "GET" {
+			http.ServeFile(res, req, "./static/signin.html")
+			return
+		}
+	} else if path == "/home" {
+		if req.Method == "GET" {
+			http.ServeFile(res, req, "./static/home.html")
+			return
+		}
+	} else {
+		http.ServeFile(res, req, "."+path)
 	}
 }
