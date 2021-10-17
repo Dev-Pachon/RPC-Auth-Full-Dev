@@ -1,4 +1,4 @@
-package model
+package database
 
 import (
 	"database/sql"
@@ -8,12 +8,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const User string = "user"
-const Password string = "password"
-const DBName string = "dbname"
+const user string = "user"
+const password string = "password"
+const dbName string = "dbname"
 
-func connectDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", `${User}:${Password}@/${DBName}`)
+func ConnectDB() (*sql.DB, error) {
+
+	connectString := fmt.Sprintf("%s:%s@/%s", user, password, dbName)
+
+	db, err := sql.Open("mysql", connectString)
 
 	if err != nil {
 		return nil, err
@@ -22,15 +25,15 @@ func connectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func create(db *sql.DB) error {
+func Create(db *sql.DB) error {
 	if _, err := db.Exec(`
-	CREATE TABLE IF NOT EXISTS users (
+	CREATE TABLE IF NOT EXISTS 'users' (
 		id INTEGER PRIMARY KEY AUTO_INCREMENT,
 		username VARCHAR(20) NOT NULL UNIQUE,
 		password VARCHAR(20) NOT NULL,
 		firstname VARCHAR(50) NOT NULL,
 		lastname VARCHAR(50) NOT NULL,
-		birthdate DATE NOT NULL
+		birthdate DATE NOT NULL CHECK (YEAR(birthdate) >= 1820 AND YEAR(birthdate) <= 2016)
 	)
 	`); err != nil {
 		return err
@@ -39,14 +42,14 @@ func create(db *sql.DB) error {
 	return nil
 }
 
-func HashPassword(password string) (string, error) {
+func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(bytes), err
 }
 
-func insert(db *sql.DB, username string, password string, firstname string, lastname string, birthdate string) error {
+func Insert(db *sql.DB, username string, password string, firstname string, lastname string, birthdate string) error {
 
-	hash, errHash := HashPassword(password)
+	hash, errHash := hashPassword(password)
 
 	if errHash != nil {
 		return errHash
@@ -61,7 +64,7 @@ func insert(db *sql.DB, username string, password string, firstname string, last
 	return nil
 }
 
-func query(db *sql.DB) (*sql.Rows, error) {
+func Query(db *sql.DB) (*sql.Rows, error) {
 
 	rows, err := db.Query("SELECT username, firstname, lastname, birthdate FROM users")
 	if err != nil {
@@ -70,7 +73,7 @@ func query(db *sql.DB) (*sql.Rows, error) {
 	return rows, nil
 }
 
-func checkLogin(db *sql.DB, username string, password string) error {
+func CheckLogin(db *sql.DB, username string, password string) error {
 	row, err := db.Query("SELECT password FROM users WHERE username =?", username)
 	if err != nil {
 		return err

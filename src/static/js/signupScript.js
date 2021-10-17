@@ -19,6 +19,10 @@ inputForm.addEventListener("submit", (e)=> {
         }
     }
 
+    if (!check) {
+        return check;
+    }
+
     let data = {
         Username: document.getElementById("username").value,
         Password: document.getElementById("password").value,
@@ -27,7 +31,7 @@ inputForm.addEventListener("submit", (e)=> {
         Birthdate: document.getElementById("birthdate").value
     };
 
-    fetch("/addUser", {
+    fetch("/signup", {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'

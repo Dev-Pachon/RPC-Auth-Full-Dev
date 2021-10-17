@@ -1,15 +1,28 @@
 package main
 
 import (
+	"RPC-AUTH-FULL-DEV/src/database"
 	"log"
 	"net/http"
 )
 
 func main() {
+	db, err := database.ConnectDB()
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = database.Create(db)
+
+	if err != nil {
+		panic(err)
+	}
 
 	http.HandleFunc("/", ServeFiles)
 
 	log.Fatal((http.ListenAndServe(":1010", nil)))
+
 }
 
 func ServeFiles(res http.ResponseWriter, req *http.Request) {
@@ -21,9 +34,17 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			http.ServeFile(res, req, "./static/signup.html")
 			return
 		}
+		if req.Method == "POST" {
+			//TODO
+			return
+		}
 	} else if path == "/signin" {
 		if req.Method == "GET" {
 			http.ServeFile(res, req, "./static/signin.html")
+			return
+		}
+		if req.Method == "POST" {
+			//TODO
 			return
 		}
 	} else if path == "/home" {
