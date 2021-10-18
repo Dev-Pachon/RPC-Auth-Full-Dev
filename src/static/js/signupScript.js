@@ -6,7 +6,9 @@ const inputForm = document.getElementById("inputForm");
 
 //Submit action
 
-$('.validate-form').on('submit', function () {
+inputForm.addEventListener("submit", (e)=> {
+
+        e.preventDefault();
 
     var check = true;
 
@@ -26,7 +28,9 @@ $('.validate-form').on('submit', function () {
         Password: document.getElementById("password").value,
         Firstname: document.getElementById("firstname").value,
         Lastname: document.getElementById("lastname").value,
-        Birthdate: document.getElementById("birthdate").value
+        Birthdate: document.getElementById("birthdate").value,
+        Country: document.getElementById("country").value,
+        University: document.getElementById("university").value
     };
 
     fetch("/signup", {
