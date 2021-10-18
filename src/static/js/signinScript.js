@@ -1,8 +1,13 @@
 console.log("Script loaded");
 
-var input = $('.validate-input .input100');
+const input = document.getElementsByTagName("input");
 
-$('.validate-form').on('submit', function () {
+const inputForm = document.getElementById("inputForm");
+
+inputForm.addEventListener("submit", (e)=> {
+
+    e.preventDefault();
+
     var check = true;
 
     for (var i = 0; i < input.length; i++) {
@@ -11,6 +16,36 @@ $('.validate-form').on('submit', function () {
             check = false;
         }
     }
+
+    if (!check) {
+        return check;
+    }
+
+    let data = {
+        Username: document.getElementById("username").value,
+        Password: document.getElementById("password").value,
+    };
+
+    fetch("/signin", {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify(data)
+    }).then((response) => {
+        response.text().then(function (data) {
+            let result = JSON.parse(data);
+            if (result["Result"] = "ok") {
+                //location.href("/home");
+            }else{
+                //limpiar campos
+                alert(result["Content"]);
+            }
+        });
+    }).catch((error) => {
+        console.log(error)
+    });
 
     return check;
 });

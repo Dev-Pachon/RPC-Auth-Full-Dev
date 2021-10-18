@@ -36,6 +36,11 @@ type user struct {
 	Birthdate string
 }
 
+type VerifyUserInput struct {
+	Username string
+	Password string
+}
+
 type VerifyUserOutput struct {
 	Result       string
 	Content      string
@@ -104,7 +109,50 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 		if req.Method == "POST" {
-			//TODO
+			var data VerifyUserInput
+			err := json.NewDecoder(req.Body).Decode(&data)
+
+			if err != nil {
+				fmt.Println("Error parsing data: " + err.Error())
+				var responseData VerifyUserOutput
+				responseData.Result = "nok"
+				responseData.Content = "Error parsing data: " + err.Error()
+				res.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(res).Encode(responseData)
+				return
+			}
+
+			db, err := database.ConnectDB()
+
+			if err != nil {
+				fmt.Println("Cannot connect to database")
+				var responseData VerifyUserOutput
+				responseData.Result = "nok"
+				responseData.Content = "Cannot connect to database"
+				res.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(res).Encode(responseData)
+				return
+			}
+
+			defer db.Close()
+
+			err = database.CheckLogin(db, data.Username, data.Password)
+
+			if err != nil {
+				fmt.Println("The username or the password is incorrect")
+				fmt.Println(err)
+				var responseData VerifyUserOutput
+				responseData.Result = "nok"
+				responseData.Content = "The username or the password is incorrect"
+				res.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(res).Encode(responseData)
+				return
+			}
+
+			var responseData VerifyUserOutput
+			responseData.Result = "ok"
+			res.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(res).Encode(responseData)
 			return
 		}
 	} else if path == "/home" {
