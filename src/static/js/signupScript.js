@@ -25,6 +25,7 @@ inputForm.addEventListener("submit", (e)=> {
 
     let data = {
         Username: document.getElementById("username").value,
+        Email: document.getElementById("email").value,
         Password: document.getElementById("password").value,
         Firstname: document.getElementById("firstname").value,
         Lastname: document.getElementById("lastname").value,

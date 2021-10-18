@@ -30,10 +30,13 @@ func Create(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTO_INCREMENT,
 		username VARCHAR(20) NOT NULL UNIQUE,
+		email VARCHAR(20) NOT NULL UNIQUE,
 		password VARCHAR(50) NOT NULL,
 		firstname VARCHAR(50) NOT NULL,
 		lastname VARCHAR(50) NOT NULL,
 		birthdate DATE NOT NULL CHECK (YEAR(birthdate) >= 1820 AND YEAR(birthdate) <= 2016)
+		country VARCHAR(50) NOT NULL,
+		university VARCHAR(50) NOT NULL,
 	)
 	`); err != nil {
 		return err
@@ -47,7 +50,7 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func Insert(db *sql.DB, username string, password string, firstname string, lastname string, birthdate string) error {
+func Insert(db *sql.DB, username string, email string, password string, firstname string, lastname string, birthdate string, country string, university string) error {
 
 	hash, errHash := hashPassword(password)
 
@@ -55,7 +58,7 @@ func Insert(db *sql.DB, username string, password string, firstname string, last
 		return errHash
 	}
 
-	DMLSentence := fmt.Sprintf("INSERT INTO users (username, password, firstname, lastname, birthdate) VALUES ('%s','%s','%s','%s','%s')", username, hash, firstname, lastname, birthdate)
+	DMLSentence := fmt.Sprintf("INSERT INTO users (username, email, password, firstname, lastname, birthdate, country, university) VALUES ('%s','%s','%s','%s','%s')", username, email, hash, firstname, lastname, birthdate, country, university)
 
 	if _, err := db.Exec(DMLSentence); err != nil {
 		return err
@@ -66,7 +69,7 @@ func Insert(db *sql.DB, username string, password string, firstname string, last
 
 func Query(db *sql.DB) (*sql.Rows, error) {
 
-	rows, err := db.Query("SELECT username, firstname, lastname, birthdate FROM users")
+	rows, err := db.Query("SELECT username, email, firstname, lastname, birthdate, country, university FROM users")
 	if err != nil {
 		return nil, err
 	}

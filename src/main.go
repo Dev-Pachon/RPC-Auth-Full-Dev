@@ -30,10 +30,13 @@ func main() {
 
 type user struct {
 	Username  string
+	Email string
 	Password  string
 	Firstname string
 	Lastname  string
 	Birthdate string
+	Country string
+	University string
 }
 
 type VerifyUserInput struct {
@@ -84,7 +87,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 
 			defer db.Close()
 
-			err = database.Insert(db, data.Username, data.Password, data.Firstname, data.Lastname, data.Birthdate)
+			err = database.Insert(db, data.Username, data.Email, data.Password, data.Firstname, data.Lastname, data.Birthdate, data.Country, data.University)
 
 			if err != nil {
 				fmt.Println("Cannot insert the element to the database")
