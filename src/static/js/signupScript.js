@@ -44,7 +44,7 @@ inputForm.addEventListener("submit", (e)=> {
     }).then((response) => {
         response.text().then(function (data) {
             let result = JSON.parse(data);
-            if (result["Result"] = "ok") {
+            if (result["Result"] ==="ok") {
                 alert("Your account was created correctly");
             }else{
                 alert(result["Content"]);
@@ -87,6 +87,12 @@ function validate(input, i) {
                 parent.attr("data-validate", "Use only letters and number for your username");
                 return false;
             }
+            regularExpr = /[ ]/;
+            if ($(element).val().match(regularExpr) != null) {
+                parent = $(element).parent();
+                parent.attr("data-validate", "Your username can’t have a blank space");
+                return false;
+            }
             break;
         case "Password":
             if (element.value.length < 8) {
@@ -102,10 +108,15 @@ function validate(input, i) {
             }
             break;
 
+        case "Email":
+            regularExpr = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+            if ($(element).val().match(regularExpr) == null) {
+                parent = $(element).parent();
+                parent.attr("data-validate", "Use a valid email");
+                return false;
+            }
+            break;
         case "Confirm password":
-
-            console.log(element.value);
-            console.log(input[i-1].value);
             
             if (element.value.localeCompare(input[i - 1].value) != 0) {
                 parent = $(element).parent();

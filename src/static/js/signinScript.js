@@ -36,8 +36,9 @@ inputForm.addEventListener("submit", (e)=> {
     }).then((response) => {
         response.text().then(function (data) {
             let result = JSON.parse(data);
-            if (result["Result"] = "ok") {
-                //location.href("/home");
+            console.log(result)
+            if (result["Result"] === "ok") {
+                location.href = "/home";
             }else{
                 //limpiar campos
                 alert(result["Content"]);

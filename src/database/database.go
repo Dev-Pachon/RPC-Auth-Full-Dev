@@ -31,12 +31,12 @@ func Create(db *sql.DB) error {
 		id INTEGER PRIMARY KEY AUTO_INCREMENT,
 		username VARCHAR(20) NOT NULL UNIQUE,
 		email VARCHAR(20) NOT NULL UNIQUE,
-		password VARCHAR(50) NOT NULL,
+		password VARCHAR(200) NOT NULL,
 		firstname VARCHAR(50) NOT NULL,
 		lastname VARCHAR(50) NOT NULL,
-		birthdate DATE NOT NULL CHECK (YEAR(birthdate) >= 1820 AND YEAR(birthdate) <= 2016)
+		birthdate DATE NOT NULL CHECK (YEAR(birthdate) >= 1820 AND YEAR(birthdate) <= 2016),
 		country VARCHAR(50) NOT NULL,
-		university VARCHAR(50) NOT NULL,
+		university VARCHAR(50) NOT NULL
 	)
 	`); err != nil {
 		return err
@@ -58,7 +58,7 @@ func Insert(db *sql.DB, username string, email string, password string, firstnam
 		return errHash
 	}
 
-	DMLSentence := fmt.Sprintf("INSERT INTO users (username, email, password, firstname, lastname, birthdate, country, university) VALUES ('%s','%s','%s','%s','%s')", username, email, hash, firstname, lastname, birthdate, country, university)
+	DMLSentence := fmt.Sprintf("INSERT INTO users (username, email, password, firstname, lastname, birthdate, country, university) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s')", username, email, hash, firstname, lastname, birthdate, country, university)
 
 	if _, err := db.Exec(DMLSentence); err != nil {
 		return err

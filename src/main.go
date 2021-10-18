@@ -29,13 +29,13 @@ func main() {
 }
 
 type user struct {
-	Username  string
-	Email string
-	Password  string
-	Firstname string
-	Lastname  string
-	Birthdate string
-	Country string
+	Username   string
+	Email      string
+	Password   string
+	Firstname  string
+	Lastname   string
+	Birthdate  string
+	Country    string
 	University string
 }
 
@@ -66,7 +66,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println("Error parsing data: " + err.Error())
 				var responseData VerifyUserOutput
-				responseData.Result = "nok"
+				responseData.Result = "Nothing is ok"
 				responseData.Content = "Error parsing data: " + err.Error()
 				res.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(res).Encode(responseData)
@@ -78,7 +78,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println("Cannot connect to database")
 				var responseData VerifyUserOutput
-				responseData.Result = "nok"
+				responseData.Result = "Nothing is ok"
 				responseData.Content = "Cannot connect to database"
 				res.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(res).Encode(responseData)
@@ -93,7 +93,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 				fmt.Println("Cannot insert the element to the database")
 				fmt.Println(err)
 				var responseData VerifyUserOutput
-				responseData.Result = "nok"
+				responseData.Result = "Nothing is ok"
 				responseData.Content = "Cannot insert the element to the database"
 				res.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(res).Encode(responseData)
@@ -118,7 +118,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println("Error parsing data: " + err.Error())
 				var responseData VerifyUserOutput
-				responseData.Result = "nok"
+				responseData.Result = "Nothing is ok"
 				responseData.Content = "Error parsing data: " + err.Error()
 				res.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(res).Encode(responseData)
@@ -130,7 +130,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				fmt.Println("Cannot connect to database")
 				var responseData VerifyUserOutput
-				responseData.Result = "nok"
+				responseData.Result = "Nothing is ok"
 				responseData.Content = "Cannot connect to database"
 				res.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(res).Encode(responseData)
@@ -145,7 +145,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 				fmt.Println("The username or the password is incorrect")
 				fmt.Println(err)
 				var responseData VerifyUserOutput
-				responseData.Result = "nok"
+				responseData.Result = "Nothing is ok"
 				responseData.Content = "The username or the password is incorrect"
 				res.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(res).Encode(responseData)
