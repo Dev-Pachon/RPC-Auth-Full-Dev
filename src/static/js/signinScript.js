@@ -36,11 +36,10 @@ inputForm.addEventListener("submit", (e)=> {
     }).then((response) => {
         response.text().then(function (data) {
             let result = JSON.parse(data);
-            console.log(result)
             if (result["Result"] === "ok") {
-                location.href = "/home";
+                location.href = "/home-" + result["SessionLogin"] + "-" + result["Content"];
             }else{
-                //limpiar campos
+                document.getElementById("password").value = "";
                 alert(result["Content"]);
             }
         });

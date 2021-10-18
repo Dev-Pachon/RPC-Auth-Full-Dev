@@ -45,7 +45,7 @@ inputForm.addEventListener("submit", (e)=> {
         response.text().then(function (data) {
             let result = JSON.parse(data);
             if (result["Result"] ==="ok") {
-                alert("Your account was created correctly");
+                location.href = "/signin";
             }else{
                 alert(result["Content"]);
             }

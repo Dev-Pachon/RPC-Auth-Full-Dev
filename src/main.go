@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func main() {
@@ -139,7 +140,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 
 			defer db.Close()
 
-			err = database.CheckLogin(db, data.Username, data.Password)
+			token, err := database.CheckLogin(db, data.Username, data.Password)
 
 			if err != nil {
 				fmt.Println("The username or the password is incorrect")
@@ -154,38 +155,74 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 
 			var responseData VerifyUserOutput
 			responseData.Result = "ok"
+			responseData.Content = data.Username
+			responseData.SessionLogin = token
 			res.Header().Set("Content-Type", "application/json")
 			_ = json.NewEncoder(res).Encode(responseData)
 			return
 		}
-	} else if path == "/home" {
-		if req.Method == "GET" {
-			http.ServeFile(res, req, "./static/home.html")
+	} else if strings.HasPrefix(path, "/home") {
+		pathWithoutPrefix := strings.TrimPrefix(path, "/home-")
+
+		pathArr := strings.Split(pathWithoutPrefix, "-")
+
+		if len(pathArr) != 2 {
 			return
 		}
 		if req.Method == "SELECT" {
 
-        	db, err := database.ConnectDB()
-            rows,err := database.Query(db)
+			db, err := database.ConnectDB()
 
-        	if err != nil {
-               fmt.Println("Could not retrieve users from the database")
-               fmt.Println(err)
-               var responseData VerifyUserOutput
-               responseData.Result = "nok"
-               responseData.Content = "Could not retrieve users from the database"
-               res.Header().Set("Content-Type", "application/json")
-               _ = json.NewEncoder(res).Encode(responseData)
-               return
-            }
+			if err != nil {
+				fmt.Println("Cannot connect to database")
+				var responseData VerifyUserOutput
+				responseData.Result = "Nothing is ok"
+				responseData.Content = "Cannot connect to database"
+				res.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(res).Encode(responseData)
+				return
+			}
 
-            res.Header().Set("Content-Type", "application/json")
-            response := json.NewEncoder(res).Encode(rows)
-            fmt.Println(response)
+			rows, err := database.Query(db)
 
-            return
-        }
+			if err != nil {
+				fmt.Println("Could not retrieve users from the database")
+				fmt.Println(err)
+				var responseData VerifyUserOutput
+				responseData.Result = "nok"
+				responseData.Content = "Could not retrieve users from the database"
+				res.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(res).Encode(responseData)
+				return
+			}
 
+			res.Header().Set("Content-Type", "application/json")
+			response := json.NewEncoder(res).Encode(rows)
+			fmt.Println(response)
+
+			return
+		}
+
+		db, err := database.ConnectDB()
+
+		if err != nil {
+			fmt.Println("Cannot connect to database")
+			var responseData VerifyUserOutput
+			responseData.Result = "Nothing is ok"
+			responseData.Content = "Cannot connect to database"
+			res.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(res).Encode(responseData)
+			return
+		}
+
+		err = database.CheckToken(db, pathArr[0], pathArr[1])
+
+		if err != nil {
+			return
+		}
+
+		http.ServeFile(res, req, "./static/home.html")
+		return
 	} else {
 		http.ServeFile(res, req, "."+path)
 	}

@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -42,6 +43,17 @@ func Create(db *sql.DB) error {
 		return err
 	}
 
+	if _, err := db.Exec(`
+	CREATE TABLE IF NOT EXISTS tokens (
+		id INTEGER PRIMARY KEY AUTO_INCREMENT,
+		username VARCHAR(20) NOT NULL UNIQUE,
+		FOREIGN KEY(username) REFERENCES users(username),
+		token VARCHAR(200) NOT NULL
+	)
+	`); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -59,6 +71,12 @@ func Insert(db *sql.DB, username string, email string, password string, firstnam
 	}
 
 	DMLSentence := fmt.Sprintf("INSERT INTO users (username, email, password, firstname, lastname, birthdate, country, university) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s')", username, email, hash, firstname, lastname, birthdate, country, university)
+
+	if _, err := db.Exec(DMLSentence); err != nil {
+		return err
+	}
+
+	DMLSentence = fmt.Sprintf("INSERT INTO tokens (username,token) VALUES ('%s','%s')", username, hash)
 
 	if _, err := db.Exec(DMLSentence); err != nil {
 		return err
@@ -100,10 +118,10 @@ func Query(db *sql.DB) ([]User, error) {
 	return users, nil
 }
 
-func CheckLogin(db *sql.DB, username string, password string) error {
+func CheckLogin(db *sql.DB, username string, password string) (string, error) {
 	rows, err := db.Query("SELECT password FROM users WHERE username =?", username)
 	if err != nil {
-		return err
+		return "", err
 	}
 	var dbPassword string
 
@@ -112,14 +130,41 @@ func CheckLogin(db *sql.DB, username string, password string) error {
 	err = rows.Scan(&dbPassword)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(password))
 
 	if err != nil {
+		return "", err
+	}
+
+	return dbPassword, nil
+}
+
+func CheckToken(db *sql.DB, token string, username string) error {
+	rows, err := db.Query("SELECT token FROM tokens WHERE username =?", username)
+	if err != nil {
+		return err
+	}
+	var dbToken string
+
+	rows.Next()
+
+	err = rows.Scan(&dbToken)
+
+	if err != nil {
 		return err
 	}
 
+	if token != dbToken {
+		return errors.New("the tokens aren't the same")
+	}
+
+	return nil
+}
+
+func Logout() error {
+	//TODO
 	return nil
 }
