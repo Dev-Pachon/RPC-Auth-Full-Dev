@@ -77,7 +77,7 @@ func Insert(db *sql.DB, username string, email string, password string, firstnam
 		return err
 	}
 
-	token := strings.ReplaceAll("/", "", hash)
+	token := strings.ReplaceAll(hash, "/", "")
 
 	DMLSentence = fmt.Sprintf("INSERT INTO tokens (username,token) VALUES ('%s','%s')", username, token)
 
@@ -144,7 +144,7 @@ func CheckLogin(db *sql.DB, username string, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
+	dbPassword = strings.ReplaceAll(dbPassword, "/", "")
 	return dbPassword, nil
 }
 
@@ -162,8 +162,6 @@ func CheckToken(db *sql.DB, token string, username string) error {
 	if err != nil {
 		return err
 	}
-
-	dbToken = strings.ReplaceAll("/", "", dbToken)
 
 	if token != dbToken {
 		return errors.New("the tokens aren't the same")
