@@ -223,9 +223,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			}
 
 			res.Header().Set("Content-Type", "application/json")
-			response := json.NewEncoder(res).Encode(rows)
-			fmt.Println(response)
-
+			_ = json.NewEncoder(res).Encode(rows)
 			return
 		}
 
