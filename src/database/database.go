@@ -8,9 +8,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const user string = "user"
-const password string = "password"
-const dbName string = "dbname"
+const user string = "root"
+const password string = ""
+const dbName string = "users"
 
 func ConnectDB() (*sql.DB, error) {
 
@@ -27,7 +27,7 @@ func ConnectDB() (*sql.DB, error) {
 
 func Create(db *sql.DB) error {
 	if _, err := db.Exec(`
-	CREATE TABLE IF NOT EXISTS 'users' (
+	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTO_INCREMENT,
 		username VARCHAR(20) NOT NULL UNIQUE,
 		password VARCHAR(20) NOT NULL,
@@ -55,7 +55,7 @@ func Insert(db *sql.DB, username string, password string, firstname string, last
 		return errHash
 	}
 
-	DMLSentence := fmt.Sprintf("INSERT INTO users (username, password, firstname, lastname, birthdate) VALUES (%s,%s,%s,%s,%s)", username, hash, firstname, lastname, birthdate)
+	DMLSentence := fmt.Sprintf("INSERT INTO users (username, password, firstname, lastname, birthdate) VALUES ('%s','%s','%s','%s','%s')", username, hash, firstname, lastname, birthdate)
 
 	if _, err := db.Exec(DMLSentence); err != nil {
 		return err

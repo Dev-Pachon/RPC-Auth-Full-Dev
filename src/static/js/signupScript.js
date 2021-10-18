@@ -6,9 +6,7 @@ const inputForm = document.getElementById("inputForm");
 
 //Submit action
 
-inputForm.addEventListener("submit", (e)=> {
-
-    e.preventDefault();
+$('.validate-form').on('submit', function () {
 
     var check = true;
 
@@ -41,8 +39,11 @@ inputForm.addEventListener("submit", (e)=> {
     }).then((response) => {
         response.text().then(function (data) {
             let result = JSON.parse(data);
-            console.log(result)
-            alert(0)
+            if (result["Result"] = "ok") {
+                alert("Your account was created correctly");
+            }else{
+                alert(result["Content"]);
+            }
         });
     }).catch((error) => {
         console.log(error)
@@ -76,7 +77,7 @@ function validate(input, i) {
                 return false;
             }
             regularExpr = /[A-Za-z0-9]/;
-            if ($(element).val().trim().match(regularExpr) == null) {
+            if ($(element).val().match(regularExpr) == null) {
                 parent = $(element).parent();
                 parent.attr("data-validate", "Use only letters and number for your username");
                 return false;
@@ -89,7 +90,7 @@ function validate(input, i) {
                 return false;
             }
             regularExpr = /[ ]/;
-            if ($(element).val().trim().match(regularExpr) != null) {
+            if ($(element).val().match(regularExpr) != null) {
                 parent = $(element).parent();
                 parent.attr("data-validate", "Your password can’t have a blank space");
                 return false;
