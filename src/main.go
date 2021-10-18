@@ -218,6 +218,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 		err = database.CheckToken(db, pathArr[0], pathArr[1])
 
 		if err != nil {
+			fmt.Println(err)
 			return
 		}
 
