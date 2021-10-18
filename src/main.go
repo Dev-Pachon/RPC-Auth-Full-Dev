@@ -162,13 +162,39 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 	} else if strings.HasPrefix(path, "/home") {
-		pathWithoutPrefix := strings.TrimPrefix(path, "/home-")
 
-		pathArr := strings.Split(pathWithoutPrefix, "-")
+		if req.Method == "GET" {
+			pathWithoutPrefix := strings.TrimPrefix(path, "/home-")
 
-		if len(pathArr) != 2 {
+			pathArr := strings.Split(pathWithoutPrefix, "-")
+
+			if len(pathArr) != 2 {
+				return
+			}
+
+			db, err := database.ConnectDB()
+
+			if err != nil {
+				fmt.Println("Cannot connect to database")
+				var responseData VerifyUserOutput
+				responseData.Result = "Nothing is ok"
+				responseData.Content = "Cannot connect to database"
+				res.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(res).Encode(responseData)
+				return
+			}
+
+			err = database.CheckToken(db, pathArr[0], pathArr[1])
+
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			http.ServeFile(res, req, "./static/home.html")
 			return
 		}
+
 		if req.Method == "SELECT" {
 
 			db, err := database.ConnectDB()
@@ -203,27 +229,6 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		db, err := database.ConnectDB()
-
-		if err != nil {
-			fmt.Println("Cannot connect to database")
-			var responseData VerifyUserOutput
-			responseData.Result = "Nothing is ok"
-			responseData.Content = "Cannot connect to database"
-			res.Header().Set("Content-Type", "application/json")
-			_ = json.NewEncoder(res).Encode(responseData)
-			return
-		}
-
-		err = database.CheckToken(db, pathArr[0], pathArr[1])
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		http.ServeFile(res, req, "./static/home.html")
-		return
 	} else {
 		http.ServeFile(res, req, "."+path)
 	}
