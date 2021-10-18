@@ -163,6 +163,29 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			http.ServeFile(res, req, "./static/home.html")
 			return
 		}
+		if req.Method == "SELECT" {
+
+        	db, err := database.ConnectDB()
+            rows,err := database.Query(db)
+
+        	if err != nil {
+               fmt.Println("Could not retrieve users from the database")
+               fmt.Println(err)
+               var responseData VerifyUserOutput
+               responseData.Result = "nok"
+               responseData.Content = "Could not retrieve users from the database"
+               res.Header().Set("Content-Type", "application/json")
+               _ = json.NewEncoder(res).Encode(responseData)
+               return
+            }
+
+            res.Header().Set("Content-Type", "application/json")
+            response := json.NewEncoder(res).Encode(rows)
+            fmt.Println(response)
+
+            return
+        }
+
 	} else {
 		http.ServeFile(res, req, "."+path)
 	}

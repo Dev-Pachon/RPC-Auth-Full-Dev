@@ -67,13 +67,37 @@ func Insert(db *sql.DB, username string, email string, password string, firstnam
 	return nil
 }
 
-func Query(db *sql.DB) (*sql.Rows, error) {
+type User struct{
+    Username, Email, Firstname, Lastname, Birthdate, Country, University string
+}
+
+func Query(db *sql.DB) ([]User, error) {
 
 	rows, err := db.Query("SELECT username, email, firstname, lastname, birthdate, country, university FROM users")
 	if err != nil {
 		return nil, err
 	}
-	return rows, nil
+
+	user := User{}
+    	users := []User{}
+
+    	//Filling a arr with the users
+         	for rows.Next() {
+         		var username, email, firstname, lastname, birthdate, country, university string
+         		err = rows.Scan(&username, &email, &firstname, &lastname, &birthdate, &country, &university)
+
+
+         		user.Username = username
+         		user.Email = email
+         		user.Firstname = firstname
+         		user.Lastname = lastname
+         		user.Birthdate = birthdate
+         		user.Country = country
+         		user.University = university
+         		users = append(users, user)
+         	}
+
+	return users, nil
 }
 
 func CheckLogin(db *sql.DB, username string, password string) error {
