@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
@@ -76,7 +77,9 @@ func Insert(db *sql.DB, username string, email string, password string, firstnam
 		return err
 	}
 
-	DMLSentence = fmt.Sprintf("INSERT INTO tokens (username,token) VALUES ('%s','%s')", username, hash)
+	token := strings.ReplaceAll("/", "", hash)
+
+	DMLSentence = fmt.Sprintf("INSERT INTO tokens (username,token) VALUES ('%s','%s')", username, token)
 
 	if _, err := db.Exec(DMLSentence); err != nil {
 		return err
@@ -85,8 +88,8 @@ func Insert(db *sql.DB, username string, email string, password string, firstnam
 	return nil
 }
 
-type User struct{
-    Username, Email, Firstname, Lastname, Birthdate, Country, University string
+type User struct {
+	Username, Email, Firstname, Lastname, Birthdate, Country, University string
 }
 
 func Query(db *sql.DB) ([]User, error) {
@@ -97,23 +100,26 @@ func Query(db *sql.DB) ([]User, error) {
 	}
 
 	user := User{}
-    	users := []User{}
+	users := []User{}
 
-    	//Filling a arr with the users
-         	for rows.Next() {
-         		var username, email, firstname, lastname, birthdate, country, university string
-         		err = rows.Scan(&username, &email, &firstname, &lastname, &birthdate, &country, &university)
+	//Filling a arr with the users
+	for rows.Next() {
+		var username, email, firstname, lastname, birthdate, country, university string
+		err = rows.Scan(&username, &email, &firstname, &lastname, &birthdate, &country, &university)
 
+		if err != nil {
+			return nil, err
+		}
 
-         		user.Username = username
-         		user.Email = email
-         		user.Firstname = firstname
-         		user.Lastname = lastname
-         		user.Birthdate = birthdate
-         		user.Country = country
-         		user.University = university
-         		users = append(users, user)
-         	}
+		user.Username = username
+		user.Email = email
+		user.Firstname = firstname
+		user.Lastname = lastname
+		user.Birthdate = birthdate
+		user.Country = country
+		user.University = university
+		users = append(users, user)
+	}
 
 	return users, nil
 }
@@ -157,14 +163,11 @@ func CheckToken(db *sql.DB, token string, username string) error {
 		return err
 	}
 
+	dbToken = strings.ReplaceAll("/", "", dbToken)
+
 	if token != dbToken {
 		return errors.New("the tokens aren't the same")
 	}
 
-	return nil
-}
-
-func Logout() error {
-	//TODO
 	return nil
 }
