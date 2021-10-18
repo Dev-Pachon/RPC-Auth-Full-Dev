@@ -6,7 +6,9 @@ const inputForm = document.getElementById("inputForm");
 
 //Submit action
 
-$('.validate-form').on('submit', function () {
+inputForm.addEventListener("submit", (e)=> {
+
+        e.preventDefault();
 
     var check = true;
 
