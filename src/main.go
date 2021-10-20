@@ -252,11 +252,9 @@ func sendEmail(email string) {
 
 	// Message.
 	message := []byte(`
-	Dear, %s your account was created correctly.
+	Dear user, your account was created correctly.
 
-	Visit our web site: https://redprogramacioncompetitiva.com,
-
-	And sign in <a href="localhost:1010/signin">here</a>
+	Visit our web site: https://redprogramacioncompetitiva.com
 	`)
 
 	// Authentication.
