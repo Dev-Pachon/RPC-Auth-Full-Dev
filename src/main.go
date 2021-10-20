@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/smtp"
 	"strings"
 )
 
@@ -95,7 +96,7 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 				fmt.Println(err)
 				var responseData VerifyUserOutput
 				responseData.Result = "Nothing is ok"
-				responseData.Content = "Cannot insert the element to the database"
+				responseData.Content = "The username or email is already in use"
 				res.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(res).Encode(responseData)
 				return
@@ -105,6 +106,9 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 			responseData.Result = "ok"
 			res.Header().Set("Content-Type", "application/json")
 			_ = json.NewEncoder(res).Encode(responseData)
+
+			sendEmail(data.Email)
+
 			return
 		}
 	} else if path == "/signin" {
@@ -230,4 +234,39 @@ func ServeFiles(res http.ResponseWriter, req *http.Request) {
 	} else {
 		http.ServeFile(res, req, "."+path)
 	}
+}
+
+func sendEmail(email string) {
+	// Sender data.
+	from := "t3stem4ilauth@gmail.com"
+	password := "ytrewq654321"
+
+	// Receiver email address.
+	to := []string{
+		email,
+	}
+
+	// smtp server configuration.
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	// Message.
+	message := []byte(`
+	Dear, %s your account was created correctly.
+
+	Visit our web site: https://redprogramacioncompetitiva.com,
+
+	And sign in <a href="localhost:1010/signin">here</a>
+	`)
+
+	// Authentication.
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	// Sending email.
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Email Sent Successfully!")
 }

@@ -10,9 +10,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const user string = "root"
-const password string = ""
-const dbName string = "users"
+//Username in your mysql database
+const user string = "user"
+
+//Password in your mysql database
+const password string = "password"
+
+//Name of the database
+const dbName string = "dbName"
 
 func ConnectDB() (*sql.DB, error) {
 
